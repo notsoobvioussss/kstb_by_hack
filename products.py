@@ -7,4 +7,7 @@ for i in range(len(a)):
         slovar[a[i][:3]] = i+1
     else:
         slovar[a[i][:4]] = i + 1
-print(slovar)
+s = input().split('*')
+for i in s:
+    for i in range(len(a)):
+        if
