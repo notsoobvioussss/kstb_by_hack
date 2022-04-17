@@ -9,5 +9,11 @@ for i in range(len(a)):
         slovar[a[i][:4]] = i + 1
 s = input().split('*')
 for i in s:
-    for i in range(len(a)):
-        if
+    for j in range(len(a)):
+        if len (a[j]) <= 4:
+            if a[j][:3] in i:
+                print(j+1,end='*')
+        else:
+            if a[j][:4] in i:
+                print(j+1,end='*')
+
