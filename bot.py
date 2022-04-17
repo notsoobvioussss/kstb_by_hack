@@ -60,7 +60,8 @@ def start_text(message):
             bot.send_message(message.chat.id,
                              mes)
         bot.send_message(message.chat.id,
-                         "Если вам понравилось какое-либо блюдо, то введите его название, как оно указано в рецепте")
+                         "Әгәр сезгә ошады нинди дә булса ашамлык, ягъни языгыз, аның исеме, ул ничек указано бу рецепте")
+
 
     elif message.text == 'Беренче ашамлыклар':
         a = [5, 7, 11]
@@ -88,7 +89,7 @@ def start_text(message):
             bot.send_message(message.chat.id,
                              mes)
             bot.send_message(message.chat.id,
-                             "Если вам понравилось какое-либо блюдо, то введите его название, как оно указано в рецепте")
+                             "Әгәр сезгә ошады нинди дә булса ашамлык, ягъни языгыз, аның исеме, ул ничек указано бу рецепте")
     elif message.text == 'Икенче ашамлыклар':
         a = [1, 4, 6, 10, 12]
         data = requests.get(URL + "/api/get/cuisine").json()
@@ -115,7 +116,7 @@ def start_text(message):
             bot.send_message(message.chat.id,
                              mes)
             bot.send_message(message.chat.id,
-                             "Если вам понравилось какое-либо блюдо, то введите его название, как оно указано в рецепте")
+                             "Әгәр сезгә ошады нинди дә булса ашамлык, ягъни языгыз, аның исеме, ул ничек указано бу рецепте")
     elif message.text == 'Суыткыч':
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True)
         mar2 = types.KeyboardButton("Артка")
@@ -132,7 +133,7 @@ def start_text(message):
         bot.send_message(message.chat.id,
                          s)
         bot.send_message(message.chat.id,
-                         "Введите номера продуктов из списка через пробел")
+                         "Языгыз номерлары продуктлары исемлеге аша пробел")
     elif message.text == 'Яраткан ашлар':
         markup1 = types.ReplyKeyboardMarkup(resize_keyboard=True)
         mar2 = types.KeyboardButton("Артка")
@@ -140,14 +141,39 @@ def start_text(message):
         bot.send_message(message.chat.id,
                          "Сайлагыз, бу сезгә кирәк, әгәр теләсәгез кайтырга меню гади төймәгә басыгыз 'Артка' ",
                          reply_markup=markup1)
-        bot.send_message(message.chat.id,
-                         "Ваши любимые блюда:")
-        s = ''
-        for i in massiv:
-            s+= i
-            s +='\n'
-        bot.send_message(message.chat.id,
-                         s)
+        data = requests.get(URL + "/api/get/cuisine").json()
+        if len(massiv) == 0:
+            bot.send_message(message.chat.id,
+                             "Яраткан ризык юк(")
+        else:
+            bot.send_message(message.chat.id,
+                         "Сезнең яраткан аш-су:")
+        for i in data:
+            id = i['id']
+            title = i['title']
+            cookSteps = i['cookSteps']
+            cookTime = i['cookTime']
+            source = i['source']
+            calories = i['calories']
+            proteins = i['proteins']
+            fats = i['fats']
+            carboh = i['carboh']
+            products = i['products']
+            products = products[1:].split('*')
+            products = ', '.join(products)
+            cookSteps = cookSteps.split('\\n')
+            cookSteps = '\n'.join(cookSteps)
+            for j in massiv:
+                if j == title:
+                    mes = f'{title} \nНеобходимые продукты: {products} \n' \
+                    f'Рецепт:\n{cookSteps}\nВремя готовки: {cookTime} минут. \n' \
+                     f'Калории: {calories} ккал. \nБелки: {proteins} г. \nЖиры:{fats} г. \nУглеводы:{carboh} г. \n' \
+                    f'{source}'
+                    bot.send_photo(message.chat.id, photo=f"https://lafoy.ru/photo_l/foto-1626-{id}.jpg")
+                    bot.send_message(message.chat.id,
+                             mes)
+
+
 
     elif message.text[0] in '0123456789':
         data = requests.get(URL + "/api/get/cuisine").json()
@@ -155,30 +181,65 @@ def start_text(message):
         mes = mes.split(' ')
         mes.sort()
         mes = ''.join(mes)
-        s = ''
-        for i in data:
-            itog = i['itogProducts']
+        s = list()
+        for j in data:
+            itog = j['itogProducts']
             itog = itog.split('*')
             itog.sort()
             itog = ''.join(itog)
-            title = i['title']
-            category = i['category']
+            title1 = j['title']
+            category1 = j['category']
             if itog == mes:
-                s += f'Вы можете приготовить: {title} Раздел: {category}\n'
-        if s == '':
-            bot.send_message(message.chat.id, "Недостаточно продуктов для приготвления любого блюда")
+                s.append(title1)
+
+
+        if len(s)== 0:
+            bot.send_message(message.chat.id, "Теләсә кайсы ризыкны әзерләү өчен азык-төлек җитәрлек түгел")
         else:
-            bot.send_message(message.chat.id, s)
+            for i in data:
+                id = i['id']
+                title = i['title']
+                cookSteps = i['cookSteps']
+                cookTime = i['cookTime']
+                source = i['source']
+                calories = i['calories']
+                proteins = i['proteins']
+                fats = i['fats']
+                carboh = i['carboh']
+                products = i['products']
+                products = products[1:].split('*')
+                products = ', '.join(products)
+                cookSteps = cookSteps.split('\\n')
+                cookSteps = '\n'.join(cookSteps)
+                for j in s:
+                    if j == title:
+                        bot.send_message(message.chat.id,
+                                         "Сез әзерләргә \n")
+                        mes = f'{title} \nНеобходимые продукты: {products} \n' \
+                              f'Рецепт:\n{cookSteps}\nВремя готовки: {cookTime} минут. \n' \
+                              f'Калории: {calories} ккал. \nБелки: {proteins} г. \nЖиры:{fats} г. \nУглеводы:{carboh} г. \n' \
+                              f'{source}'
+                        bot.send_photo(message.chat.id, photo=f"https://lafoy.ru/photo_l/foto-1626-{id}.jpg")
+                        bot.send_message(message.chat.id,
+                                         mes)
     elif message.text == "Артка":
         welcome(message)
     else:
+
+
         s = message.text
         data = requests.get(URL + "/api/get/cuisine").json()
+        len1 = len(massiv)
         for i in data:
             title = i['title']
-            category = i['category']
             if title == s:
-                massiv.append(f'{title} Раздел: {category}')
+                massiv.append(title)
+                bot.send_message(message.chat.id,
+                                 "Ашамлык уңышлы кушу")
+        if len(massiv) == len1:
+            bot.send_message(message.chat.id,
+                             "Мондый ризык юк")
+
 
 
 
